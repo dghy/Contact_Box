@@ -2,8 +2,6 @@
 # Created by https://www.gitignore.io/api/pydev,django,eclipse,pycharm
 
 
-.idea
-
 ### Django ###
 *.log
 *.pot
