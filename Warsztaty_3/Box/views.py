@@ -7,10 +7,24 @@ from django.core.exceptions import ObjectDoesNotExist
 from Box.models import *
 
 
+def try_db(table_name,id):
+    try:
+        table_row = table_name.objects.get(pk=id)
+        return table_row
+    except ObjectDoesNotExist:
+        table_row = None
+        return table_row
+
+
 class ShowAll(View):
     def get(self, request):
         response = HttpResponse()
-        response.write("Show All")
+        response.write("<h1>Contact list..</h1>")
+        persons = Person.objects.all()
+        response.write('<ol>')
+        for person in persons:
+            response.write('<li>{} {}</li>'.format(person.first_name,person.last_name))
+        response.write('</ol>')
         return response
 
 
@@ -23,87 +37,103 @@ class NewPerson(View):
                         <input name="first_name" type="text" maxlength="255" value=""/><br>
                         <label>Last Name</label><br>
                         <input name="last_name" type="text" maxlength="255" value=""/><br>
-                        <br>
-                        <label>Address:</label></br> 
-                        {}
-                        <br>                                
-                        <label>Telephone:</label><br>
-                        {}
-                        <br>                        
-                        <label>E-mail:</label><br>
-                        <a href=/add_email>Add Email..</a><br>
-                        <br>
-                    </form>                       
-                        
+                        <br>"""
+
+    html_address = """
+                   <label>Address:</label></br> 
+                   {}
+                   <br>
+                   """
+    html_telephone = """                                                  
+                     <label>Telephone:</label><br>
+                     {}
+                     <br>
+                     """
+    html_email = """
+                 <label>E-mail:</label><br>
+                 {}
+                 <br>
+                 """
+    html_text = """ </form>                
                     <h5>Write description of person here:</h5>                    
                     <textarea rows="4" cols="50" name="description" form="new_form">
-Enter text here...
-                    </textarea><br>
+Enter text here...  </textarea><br>
                     <button type="submit" name="submit" value="name" form="new_form">Add New!</button>   
-                  
                 </html>"""
 
     def get(self, request):
-        address = None
         in_form_address = """
                 City: {}, Street: {}, House Number: {}, Door Number: {} 
                 <a href=/add_address>Change Address..</a><br>            
                 """
 
-        telephone = None
         in_form_telephone = """
                 Number: {}, Number Type: {} 
                 <a href=/add_telephone>Change Telephone..</a><br>            
                 """
-
+        in_form_email = """
+                Email: {}, Email Type: {} 
+                <a href=/add_email>Change Email..</a><br>            
+                """
         response = HttpResponse()
+        response.write(self.HTML)
         # try:  # try get data form DB
-        address = Address.objects.get(pk=1)
-        telephone = Telephone.objects.get(pk=1)
+        #     address = Address.objects.get(pk=1)
+        #     telephone = Telephone.objects.get(pk=1)
         # except ObjectDoesNotExist:  # if there is no such tables in DB
+        address = None
+        telephone = None
+        email = None
 
         # first display with no data inputed in the address,telephone and mail
         if address is None:
-            response.write(self.HTML.format("<a href=/add_address>Add Address..</a><br>", in_form_telephone))
+            response.write(self.html_address.format("<a href=/add_address>Add Address..</a><br>"))
         else:
             city = address.city
             street = address.street
             h_number = address.house_number
             d_number = address.door_number
             in_form_address = in_form_address.format(city, street, h_number, d_number)
+            response.write(self.html_address.format(in_form_address))
+
 
         ##################################################################
 
         if telephone is None:
-            response.write(self.HTML.format(in_form_address, "<a href=/add_telephone>Add Telephone..</a><br>"))
+            response.write(self.html_telephone.format("<a href=/add_telephone>Add Telephone..</a><br>"))
         else:
             telephone = Telephone.objects.get(pk=1)
             number = telephone.number
             num_type = telephone.get_type_display()
 
             in_form_telephone = in_form_telephone.format(number, num_type)
+            response.write(self.html_telephone.format(in_form_telephone))
 
+        if email is None:
+            response.write(self.html_telephone.format("<a href=/add_email>Add Email..</a><br>"))
+        else:
+            email = Email.objects.get(pk=1)
+            e_address = email.email
+            e_type = email.type
 
-        response.write(self.HTML.format(in_form_address, in_form_telephone))
+            in_form_email = in_form_email.format(e_address, e_type)
+            response.write(self.html_email.format(in_form_email))
+
+        response.write(self.html_text)
         return response
 
     def post(self, request):
 
-        # when you want to save all person data into DB
-        response = HttpResponse()
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
-
-        response.write(first_name)
-        response.write(" ")
-        response.write(last_name)
-        return response
+        Person.objects.create(first_name=first_name,last_name=last_name)
+        return HttpResponseRedirect("/")
 
 
 class ShowPerson(View):
     def get(self, request):
         response = HttpResponse()
-        response.write("Show Person")
+        response.write("Pokazuje osobe")
         return response
 
 

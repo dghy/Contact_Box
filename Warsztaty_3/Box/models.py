@@ -24,7 +24,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
 
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    telephone = models.ForeignKey(Telephone, on_delete=models.CASCADE)
-    e_mail = models.ForeignKey(Email, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True)
+    telephone = models.ForeignKey(Telephone, on_delete=models.CASCADE, null=True)
+    e_mail = models.ForeignKey(Email, on_delete=models.CASCADE, null=True)
     description = models.TextField()
