@@ -32,8 +32,8 @@ urlpatterns = [
     url(r'^delete_person/(?P<id>\d+)$',csrf_exempt (DeletePerson.as_view())),
     url(r'^show_person/(?P<id>\d+)$',csrf_exempt (ShowPerson.as_view())),
      
-    url(r'^add_address/$', csrf_exempt(AddAddress.as_view())), 
-    url(r'^add_telephone/$',csrf_exempt (AddTelephone.as_view())),
-    url(r'^add_email/$',csrf_exempt(AddEmail.as_view())),
+    url(r'^(?P<id>\d+)/add_address/$', csrf_exempt(AddAddress.as_view())),
+    url(r'^(?P<id>\d+)/add_telephone/$',csrf_exempt (AddTelephone.as_view())),
+    url(r'^(?P<id>\d+)/add_email/$',csrf_exempt(AddEmail.as_view())),
 
 ]
