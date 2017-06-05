@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from Box.models import *
 
 
-def try_db(table_name,id):
+def try_db(table_name, id):
     try:
         table_row = table_name.objects.get(pk=id)
         return table_row
@@ -23,7 +23,28 @@ class ShowAll(View):
         persons = Person.objects.all()
         response.write('<ol>')
         for person in persons:
-            response.write('<li>{} {}</li>'.format(person.first_name,person.last_name))
+
+            mod_button = """<form action="/modify_person/{}"
+                            style="display:inline;>
+                                   margin: 0; 
+                                   padding: 0;">
+                                <input type="submit" value="Modify Person Data" />
+                            </form>""".format(person.id)
+
+            del_button = """<form action="/delete_person/{}"
+                            style="display:inline;
+                                   margin: 0; 
+                                   padding: 0;">
+                                <input type="submit" value="Delete Person" />
+                            </form>""".format(person.id)
+
+            response.write('<li><a href="/show_person/{}">{} {} {} {}</a></li><br>'.format(person.id,
+                                                                                 person.first_name,
+                                                                                 person.last_name,
+                                                                                 mod_button,
+                                                                                 del_button))
+
+
         response.write('</ol>')
         return response
 
@@ -58,7 +79,8 @@ class NewPerson(View):
                     <h5>Write description of person here:</h5>                    
                     <textarea rows="4" cols="50" name="description" form="new_form">
 Enter text here...  </textarea><br>
-                    <button type="submit" name="submit" value="name" form="new_form">Add New!</button>   
+                    <button type="submit" name="submit" value="name"
+                     form="new_form">Add New!</button>   
                 </html>"""
 
     def get(self, request):
@@ -100,7 +122,8 @@ Enter text here...  </textarea><br>
         ##################################################################
 
         if telephone is None:
-            response.write(self.html_telephone.format("<a href=/add_telephone>Add Telephone..</a><br>"))
+            response.write(self.html_telephone.format("<a href=/add_telephone>"
+                                                      "Add Telephone..</a><br>"))
         else:
             telephone = Telephone.objects.get(pk=1)
             number = telephone.number
@@ -131,21 +154,20 @@ Enter text here...  </textarea><br>
 
 
 class ShowPerson(View):
-    def get(self, request):
+    def get(self, request, id):
         response = HttpResponse()
         response.write("Pokazuje osobe")
         return response
 
 
 class DeletePerson(View):
-    def get(self, request):
-        response = HttpResponse()
-        response.write("Delete Person")
-        return response
+    def get(self, request, id):
+        Person.objects.get(pk=id).delete()
+        return HttpResponseRedirect('/')
 
 
 class ModifyPerson(View):
-    def get(self, request):
+    def get(self, request, id):
         response = HttpResponse()
         response.write("Modify Person")
         return response
@@ -167,7 +189,8 @@ class AddAddress(View):
                     <label>Door Number:</label><br>
                     <input name="d_number" type="number" min="1" value="1"/><br>
 
-                    <button type="submit" name="submit" value="name" form="new_form">Add Address!</button>   
+                    <button type="submit" name="submit" value="name" form="new_form">
+                    Add Address!</button>   
                 </form>
              """
 
@@ -183,7 +206,8 @@ class AddAddress(View):
         street = request.POST.get("street")
         h_number = request.POST.get("h_number")
         d_number = request.POST.get("d_number")
-        Address.objects.create(city=city, street=street, house_number=h_number, door_number=d_number)
+        Address.objects.create(city=city, street=street, house_number=h_number,
+                               door_number=d_number)
         return HttpResponseRedirect('/new_person')
 
 
@@ -198,7 +222,8 @@ class AddTelephone(View):
                            <option value="1">Home Number</option>
                            <option value="2">Work Number</option>
                        </select>
-                       <button type="submit" name="submit" value="telephone" form="new_form">Add Number!</button>   
+                       <button type="submit" name="submit" value="telephone" form="new_form">
+                       Add Number!</button>   
                    </form>
                 """
 
