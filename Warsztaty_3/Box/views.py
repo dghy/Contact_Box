@@ -52,6 +52,9 @@ class ShowAll(View):
 
 
 class NewPerson(View):
+    back_button = """<form action="/">                        
+                         <input type="submit" value="Back.." />
+                     </form>"""
     HTML = """
             <html>
                 <h2>You are adding new person!</h2>                   
@@ -67,13 +70,13 @@ class NewPerson(View):
                     <label>Street:</label>
                     <input name="street" type="text" maxlength="255" value=""/><br>
                     <label>House Number:</label>
-                    <input name="h_number" type="number" min=1  value="1"/><br>
+                    <input name="h_number" type="number" min=1 value="0"/><br>
                     <label>Door Number:</label>
-                    <input name="d_number" type="number" min=1  value="1"/><br>                                                                
+                    <input name="d_number" type="number" min=1 value="0"/><br>                                                                
                     
                     <h4><u>Telephone</u></h4>
                     <label>Telephone Number:</label><br>
-                    <input name="tel_number" type="number" min=1 step="1"  value="11111111"/><br>
+                    <input name="tel_number" type="number" min=1 step="1" value="0"/><br>
                     <label>Telephone Type:</label><br>
                     <select name = "tel_type">
                         <option value="1">Home Number</option>
@@ -90,9 +93,8 @@ class NewPerson(View):
                     </select>
                 </form>                
                 <h5>Write description of person here:</h5>                    
-                <textarea rows="4" cols="50" name="description" form="new_form">
-                Enter description here..
-                </textarea><br>
+                <textarea rows="4" cols="50" name="description"
+                 placeholder="Enter description here.." form="new_form"></textarea><br>
                 <button type="submit" name="submit" value="name"
                  form="new_form">Add!</button>   
             </html>"""
@@ -100,6 +102,7 @@ class NewPerson(View):
     def get(self, request):
         response = HttpResponse()
         response.write(self.HTML)
+        response.write(self.back_button)
         return response
 
     def post(self, request):
@@ -125,6 +128,7 @@ class ShowPerson(View):
     def get(self, request, id):
         response = HttpResponse()
         person = Person.objects.get(pk=id)
+
         table = """
                 <table border="1">  
                     <tr>
@@ -132,15 +136,15 @@ class ShowPerson(View):
                     </tr>
                     <tr>
                         <th>Address</th>
-                        <td>{} {} {} {}</td>
+                        <td>{} {} {}/{}</td>
                     </tr>
                     <tr>
                         <th>Telephone</th>
-                        <td>{} {}</td>
+                        <td>{}: {}</td>
                     </tr>
                     <tr>
                         <th>Email</th>
-                        <td>{} {}</td>
+                        <td>{}: {}</td>
                     </tr>
                     <tr>
                         <th>Description</th>
@@ -150,8 +154,8 @@ class ShowPerson(View):
                 """.format(person.first_name, person.last_name,
                            person.address.city, person.address.street,
                            person.address.house_number, person.address.door_number,
-                           person.telephone.number, person.telephone.type,
-                           person.e_mail.email, person.e_mail.type,
+                           person.telephone.get_type_display(), person.telephone.number,
+                           person.e_mail.get_type_display(), person.e_mail.email,
                            person.description)
 
         response.write(table)
@@ -173,24 +177,28 @@ class ModifyPerson(View):
         response = HttpResponse()
         person = Person.objects.get(pk=id)
         address_button = """<form action="/{}/add_address/"
-                                    style="display:inline;>
-                                           margin: 0; 
-                                           padding: 0;">
-                                        <input type="submit" value="Change Address" />
-                                    </form>""".format(person.id)
+                                   style="display:inline;>
+                                   margin: 0; 
+                                   padding: 0;">
+                                <input type="submit" value="Change Address" />
+                            </form>""".format(person.id)
         telephone_button = """<form action="/{}/add_telephone/"
-                                    style="display:inline;>
-                                           margin: 0; 
-                                           padding: 0;">
-                                        <input type="submit" value="Change Telephone" />
-                                    </form>""".format(person.id)
+                                       style="display:inline;>
+                                       margin: 0; 
+                                       padding: 0;">
+                                    <input type="submit" value="Change Telephone" />
+                                </form>""".format(person.id)
 
         email_button = """<form action="/{}/add_email/"
-                                    style="display:inline;>
-                                           margin: 0; 
-                                           padding: 0;">
-                                        <input type="submit" value="Change Email" />
-                                    </form>""".format(person.id)
+                                   style="display:inline;>
+                                   margin: 0; 
+                                   padding: 0;">
+                                <input type="submit" value="Change Email" />
+                            </form>""".format(person.id)
+
+        back_button = """<form action="/">                        
+                             <input type="submit" value="Back.." />
+                         </form>"""
 
         HTML = """
                         <html>
@@ -209,14 +217,18 @@ class ModifyPerson(View):
 {}
                             </textarea><br>
                             <button type="submit" name="submit" value="name"
-                             form="new_form">Change!</button>   
+                             form="new_form">Change!</button>
+                           
                         </html>""".format(person.first_name,person.last_name,
                                           person.first_name, person.last_name,
                                           address_button,
                                           telephone_button,
                                           email_button,
                                           person.description)
+
+
         response.write(HTML)
+        response.write(back_button)
         return response
 
     def post(self, request, id):
@@ -242,10 +254,10 @@ class AddAddress(View):
                     <input name="street" type="text" maxlength="255" value=""/><br>
                         
                     <label>House Number:</label></br> 
-                    <input name="h_number" type="number" min="1" value="1"/><br>
+                    <input name="h_number" type="number" min="1" value=""/><br>
                                                             
                     <label>Door Number:</label><br>
-                    <input name="d_number" type="number" min="1" value="1"/><br>
+                    <input name="d_number" type="number" min="1" value=""/><br>
 
                     <button type="submit" name="submit" value="name" form="new_form">
                     Add Address!</button>   
@@ -285,7 +297,7 @@ class AddTelephone(View):
                        <select name = "num_type">
                            <option value="1">Home Number</option>
                            <option value="2">Work Number</option>
-                       </select>
+                       </select><br>
                        <button type="submit" name="submit" value="telephone" form="new_form">
                        Add Number!</button>   
                    </form>
@@ -302,6 +314,7 @@ class AddTelephone(View):
     def post(self, request, id):
         number = request.POST.get("number")
         num_type = request.POST.get("num_type")
+
         person = Person.objects.get(pk=id)
         telephone = Telephone.objects.create(number=number, type=num_type)
         person.telephone = telephone
@@ -323,7 +336,7 @@ class AddEmail(View):
                        <select name = "email_type">
                            <option value="1">Home Email</option>
                            <option value="2">Work Email</option>
-                       </select>
+                       </select><br>
                        <button type="submit" name="submit" value="email" form="new_form">
                        Add Email!</button>   
                    </form>
@@ -340,6 +353,7 @@ class AddEmail(View):
     def post(self, request, id):
         email = request.POST.get("email")
         email_type = request.POST.get("email_type")
+
         person = Person.objects.get(pk=id)
         email = Email.objects.create(email=email, type=email_type)
         person.e_mail = email

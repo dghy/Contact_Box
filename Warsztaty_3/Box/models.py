@@ -10,13 +10,13 @@ class Address(models.Model):
 
 class Telephone(models.Model):
     number = models.IntegerField()
-    types = ((1, "Home Number"), (2, "Work Number"))
+    types = (("1", "Home Number"), ("2", "Work Number"))
     type = models.CharField(choices=types, default=1, max_length=32)
 
 
 class Email(models.Model):
     email = models.CharField(max_length=32)
-    types = ((1, "Home Number"), (2, "Work Number"))
+    types = (("1", "Home Email"), ("2", "Work Email"))
     type = models.CharField(choices=types, default=1, max_length=32)
 
 
