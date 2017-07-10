@@ -18,6 +18,11 @@ from Box.models import *
 
 class ShowAll(View):
     def get(self, request):
+        """
+        Shows all contacts.
+        :param request: Html request
+        :return: Html response
+        """
         response = HttpResponse()
         response.write("<h1>Contact list..</h1>")
         persons = Person.objects.all()
@@ -27,7 +32,8 @@ class ShowAll(View):
                             style="display:inline;>
                                    margin: 0; 
                                    padding: 0;">
-                                <input type="submit" value="Modify Person Data" />
+                                <input type="submit" 
+                                 value="Modify Person Data" />
                             </form>""".format(person.id)
 
             del_button = """<form action="/delete_person/{}"
@@ -37,11 +43,12 @@ class ShowAll(View):
                                 <input type="submit" value="Delete Person" />
                             </form>""".format(person.id)
 
-            response.write('<li><a href="/show_person/{}">{} {}</a> {} {}</li><br>'.format(person.id,
-                                                                                           person.first_name,
-                                                                                           person.last_name,
-                                                                                           mod_button,
-                                                                                           del_button))
+            response.write('<li><a href="/show_person/{}">'
+                           '{} {}</a> {} {}</li><br>'.format(person.id,
+                                                             person.first_name,
+                                                             person.last_name,
+                                                             mod_button,
+                                                             del_button))
         response.write('</ol><br>')
         new_button = """<form action="/new_person">
                             <input type="submit" value="Add New Person" />
@@ -60,15 +67,19 @@ class NewPerson(View):
                 <h2>You are adding new person!</h2>                   
                 <form method="post" action="" id="new_form">
                     <label><u>First Name</u></label><br>
-                    <input name="first_name" type="text" maxlength="255" value=""/><br>
+                    <input name="first_name" type="text" maxlength="255" 
+                    value=""/><br>
                     <label><u>Last Name</u></label><br>
-                    <input name="last_name" type="text" maxlength="255" value=""/><br>                         
+                    <input name="last_name" type="text" maxlength="255" 
+                    value=""/><br>
                    
                     <h4><u>Address</u></h4>
                     <label>City:</label>
-                    <input name="city" type="text" maxlength="255" value=""/><br>
+                    <input name="city" type="text" maxlength="255" value=""/>
+                    <br>
                     <label>Street:</label>
-                    <input name="street" type="text" maxlength="255" value=""/><br>
+                    <input name="street" type="text" maxlength="255" value=""/>
+                    <br>
                     <label>House Number:</label>
                     <input name="h_number" type="number" min=1 value="0"/><br>
                     <label>Door Number:</label>
@@ -76,7 +87,9 @@ class NewPerson(View):
                     
                     <h4><u>Telephone</u></h4>
                     <label>Telephone Number:</label><br>
-                    <input name="tel_number" type="number" min=1 step="1" value="0"/><br>
+                    <input name="tel_number" type="number" min=1 step="1" 
+                    value="0"/>
+                    <br>
                     <label>Telephone Type:</label><br>
                     <select name = "tel_type">
                         <option value="1">Home Number</option>
@@ -85,7 +98,8 @@ class NewPerson(View):
                                        
                     <h4><u>E-mail</u></h4>
                     <label>E-mail:</label><br> 
-                    <input name="email" type="text" maxlength="255" value=""/><br>
+                    <input name="email" type="text" maxlength="255" value=""/>
+                    <br>
                     <label>E-mail Type:</label><br> 
                     <select name="email_type" value="">
                         <option value="1">Home Email</option>
@@ -94,38 +108,66 @@ class NewPerson(View):
                 </form>                
                 <h5>Write description of person here:</h5>                    
                 <textarea rows="4" cols="50" name="description"
-                 placeholder="Enter description here.." form="new_form"></textarea><br>
+                 placeholder="Enter description here.." form="new_form">
+                </textarea>
+                <br>
                 <button type="submit" name="submit" value="name"
                  form="new_form">Add!</button>   
             </html>"""
 
     def get(self, request):
+        """
+        Returns form for new person creation
+        :param request: Http request
+        :return: Http response
+        """
         response = HttpResponse()
         response.write(self.HTML)
         response.write(self.back_button)
         return response
 
     def post(self, request):
+        """
+        Gets data from POSTED form and creates new Person object
+        :param request: Http request
+        :return: Http response redirect
+        """
         address = Address.objects.create(city=request.POST.get('city'),
                                          street=request.POST.get('street'),
-                                         house_number=int(request.POST.get('h_number')),
-                                         door_number=int(request.POST.get('d_number')))
+                                         house_number=int(
+                                             request.POST.get('h_number')
+                                         ),
+                                         door_number=int(
+                                             request.POST.get('d_number')
+                                         ))
 
-        telephone = Telephone.objects.create(number=int(request.POST.get('tel_number')),
-                                             type=int(request.POST.get('tel_type')))
+        telephone = Telephone.objects.create(number=int(
+                                            request.POST.get('tel_number')
+                                            ),
+                                            type=int(
+                                                 request.POST.get('tel_type')
+                                            ))
 
         email = Email.objects.create(email=request.POST.get('email'),
                                      type=request.POST.get('email_type'))
 
         Person.objects.create(first_name=request.POST.get('first_name'),
                               last_name=request.POST.get('last_name'),
-                              address=address, telephone=telephone, e_mail=email,
+                              address=address,
+                              telephone=telephone,
+                              e_mail=email,
                               description=request.POST.get('description'))
         return HttpResponseRedirect("/")
 
 
 class ShowPerson(View):
     def get(self, request, id):
+        """
+        Gets data of person with ID = id
+        :param request: http request
+        :param id: ID of row in the Person table
+        :return: http response
+        """
         response = HttpResponse()
         person = Person.objects.get(pk=id)
 
@@ -153,9 +195,12 @@ class ShowPerson(View):
                 </table>
                 """.format(person.first_name, person.last_name,
                            person.address.city, person.address.street,
-                           person.address.house_number, person.address.door_number,
-                           person.telephone.get_type_display(), person.telephone.number,
-                           person.e_mail.get_type_display(), person.e_mail.email,
+                           person.address.house_number,
+                           person.address.door_number,
+                           person.telephone.get_type_display(),
+                           person.telephone.number,
+                           person.e_mail.get_type_display(),
+                           person.e_mail.email,
                            person.description)
 
         response.write(table)
@@ -168,12 +213,24 @@ class ShowPerson(View):
 
 class DeletePerson(View):
     def get(self, request, id):
+        """
+        Deletes row with ID = id in Person table
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response redirect
+        """
         Person.objects.get(pk=id).delete()
         return HttpResponseRedirect('/')
 
 
 class ModifyPerson(View):
     def get(self, request, id):
+        """
+        Shows form which allows modification of row in Person table
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response
+        """
         response = HttpResponse()
         person = Person.objects.get(pk=id)
         address_button = """<form action="/{}/add_address/"
@@ -186,7 +243,8 @@ class ModifyPerson(View):
                                        style="display:inline;>
                                        margin: 0; 
                                        padding: 0;">
-                                    <input type="submit" value="Change Telephone" />
+                                    <input type="submit" 
+                                    value="Change Telephone" />
                                 </form>""".format(person.id)
 
         email_button = """<form action="/{}/add_email/"
@@ -205,15 +263,18 @@ class ModifyPerson(View):
                             <h2>You are editing {} {}! </h2>                   
                             <form method="post" action="" id="new_form">
                                 <label><u>First Name</u></label><br>
-                                <input name="first_name" type="text" maxlength="255" value="{}"/><br>
+                                <input name="first_name" type="text" 
+                                maxlength="255" value="{}"/><br>
                                 <label><u>Last Name</u></label><br>
-                                <input name="last_name" type="text" maxlength="255" value="{}"/><br>                         
+                                <input name="last_name" type="text" 
+                                maxlength="255" value="{}"/><br>                         
                             </form>
                             {}
                             {}   
                             {}
                             <h5>Write description of person here:</h5>                    
-                            <textarea rows="4" cols="50" name="description" form="new_form">
+                            <textarea rows="4" cols="50" name="description" 
+                            form="new_form">
 {}
                             </textarea><br>
                             <button type="submit" name="submit" value="name"
@@ -226,12 +287,17 @@ class ModifyPerson(View):
                                           email_button,
                                           person.description)
 
-
         response.write(HTML)
         response.write(back_button)
         return response
 
     def post(self, request, id):
+        """
+        Gets data from POSTED form and updates row with ID = id in Person table
+        :param request: http request
+        :param id: ID of row to be updated in Person table
+        :return: http response redirect
+        """
         person = Person.objects.get(pk=id)
         person.first_name = request.POST.get('first_name')
         person.last_name = request.POST.get('last_name')
@@ -266,18 +332,31 @@ class AddAddress(View):
              """
 
     def get(self, request, id):
+        """
+        Shows form for adding new address for person with ID = id
+        :param request: http request
+        :param id: ID of person which address should be added
+        :return: http response
+        """
         response = HttpResponse()
         back_button = self.back_button.format(id)
         response.write(self.HTML.format(back_button))
         return response
 
     def post(self, request, id):
+        """
+        Gets data from POSTED form and adds address for person with ID = id
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response redirect
+        """
         city = request.POST.get("city")
         street = request.POST.get("street")
         h_number = request.POST.get("h_number")
         d_number = request.POST.get("d_number")
-        address = Address.objects.create(city=city, street=street, house_number=h_number,
-                               door_number=d_number)
+        address = Address.objects.create(city=city, street=street,
+                                         house_number=h_number,
+                                         door_number=d_number)
         person = Person.objects.get(pk=id)
         person.address = address
         person.save()
@@ -306,12 +385,25 @@ class AddTelephone(View):
 
 
     def get(self, request, id):
+        """
+        Shows form for adding new telephone for a person with ID = id
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response
+        """
         response = HttpResponse()
         back_button = self.back_button.format(id)
         response.write(self.HTML.format(back_button))
         return response
 
     def post(self, request, id):
+        """
+        Gets data from POSTED form and adds telephone number for Person with
+        ID = id
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response redirect
+        """
         number = request.POST.get("number")
         num_type = request.POST.get("num_type")
 
@@ -344,13 +436,25 @@ class AddEmail(View):
                 """
 
     def get(self, request, id):
+        """
+        Shows form for adding new email for a person with ID = id
+        :param request: http request
+        :param id: ID of row in Person Table
+        :return: http response
+        """
         response = HttpResponse()
         back_button = self.back_button.format(id)
         response.write(self.HTML.format(back_button))
-
         return response
 
     def post(self, request, id):
+        """
+        Gets data from POSTED form and adds email for Person with
+        ID = id
+        :param request: http request
+        :param id: ID of row in Person table
+        :return: http response redirect
+        """
         email = request.POST.get("email")
         email_type = request.POST.get("email_type")
 
