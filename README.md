@@ -11,7 +11,7 @@ Default urls:
 
 - localhost:8000/modify_person/{id} -> shows form for modifing person (with ID = id) information <br>
 
-- localhost:8000/delete_person/{id} -> shows form for deleting person (with ID = id) <br>
+- localhost:8000/delete_person/{id} -> shows form for deleting person with ID = id <br>
 
 - localhost:8000/show_person/{id} -> shows detailed information of person with ID = id <br>
 
